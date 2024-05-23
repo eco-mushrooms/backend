@@ -89,15 +89,16 @@ if DEVELOPMENT_MODE:
         }
     }
 elif DEVELOPMENT_MODE is False:
-    DATABASE_URL = os.getenv('DATABASE_URL', None)
-    if DATABASE_URL is None:
-        raise Exception('DATABASE_URL environment variable not defined')
-
-    if DATABASE_URL:
-        DATABASES = {
-            'default': dj_database_url.parse(DATABASE_URL)
+    DATABASES = {
+        'default': {
+            'ENGINE': os.getenv('DATABASE_ENGINE'),
+            'NAME': os.getenv('DATABASE_NAME'),
+            'USER': os.getenv('DATABASE_USER'),
+            'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+            'HOST': os.getenv('DATABASE_HOST'),
+            'PORT': os.getenv('DATABASE_PORT'),
         }
-
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -137,7 +138,7 @@ STATICFILES_DIRS = [BASE_DIR / 'static',]
 
 # Media files (Images, Videos, etc)
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / 'mediafiles'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
