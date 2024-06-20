@@ -41,6 +41,8 @@ INSTALLED_APPS = [
 
     # Local apps
     'mushroom',
+    'sensor',
+
 
     # Third party apps
     'rest_framework',
