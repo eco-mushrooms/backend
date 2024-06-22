@@ -8,5 +8,5 @@ urlpatterns = [
 ]
 
 websocket_urlpatterns = [
-    path('ws/mushroom/', MushroomConsumer.as_asgi()),
+    path('ws/mushroom/<str:farm_name>/', MushroomConsumer.as_asgi()),
 ]

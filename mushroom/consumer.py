@@ -10,11 +10,7 @@ class MushroomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_group_name = self.scope['url_route']['kwargs']['farm_name']
 
-        # Join room group
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         await self.accept()
         # Send a message to the client when a new connection is established
@@ -34,32 +30,30 @@ class MushroomConsumer(AsyncWebsocketConsumer):
         )
 
     # Receive message from WebSocket
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        type = text_data_json['type']
+    async def receive(self, text_data):  # ignore the warning, it's a false positive
+        text_data = json.loads(text_data)
+        print(text_data)
+        message = text_data['message']
+        _type = text_data['type']
 
-        if type == 'new_connection':
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    'type': 'new_connection',
-                    'message': message
-                }
-            )
-        elif type == 'monitor':
-            microcontroller_name = text_data_json['microcontroller_name']
-            sensor_data: dict = text_data_json['sensor_data']
+        if _type == 'monitor':
+            microcontroller_name = text_data['microcontroller_name']
+            sensor_data: dict = text_data['sensor_data']
             microcontroller = await self.get_microcontroller(microcontroller_name)
 
+            if microcontroller is None:
+                await self.error_message(f'Microcontroller with name {microcontroller_name} does not exist')
+                return
+
             # TODO: Save sensor data to the database (I advice we dedicate a background task to do this i.e using
-            #  celery)
+            #   celery)
             # For now lets relay the data first to the channel layer
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
                     'type': 'monitor',
                     'microcontroller_name': microcontroller_name,
+                    'message': message,
                     'sensor_data': sensor_data
                 }
             )
@@ -78,6 +72,12 @@ class MushroomConsumer(AsyncWebsocketConsumer):
             'message': message
         }))
 
+    async def error_message(self, error_message: str):
+        await self.send(text_data=json.dumps({'error': error_message}))
+
     @sync_to_async
     def get_microcontroller(self, name):
-        return Microcontroller.objects.get(name=name)
+        try:
+            return Microcontroller.objects.get(name=name)
+        except Microcontroller.DoesNotExist:
+            return None
