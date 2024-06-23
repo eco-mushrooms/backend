@@ -159,13 +159,15 @@ REST_FRAMEWORK = {
 # Channels
 if DEVELOPMENT_MODE:
     CHANNEL_LAYERS = {
-        'default': {
-            'BACKEND': 'channels.layers.InMemoryChannelLayer'
-        }
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [("127.0.0.1", 6379)],
+            },
+        },
     }
 elif DEVELOPMENT_MODE is False:
     CHANNEL_LAYERS = {
-        # TODO: Add redis server backend for production
         # Since the project is dockerized, we can use the redis container as the backend, service name is redis
         'default': {
             'BACKEND': 'channels_redis.core.RedisChannelLayer',
