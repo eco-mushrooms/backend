@@ -46,6 +46,8 @@ INSTALLED_APPS = [
 
     # Third party apps
     'rest_framework',
+    'django_celery_results',
+
 ]
 
 MIDDLEWARE = [
@@ -166,6 +168,17 @@ if DEVELOPMENT_MODE:
             },
         },
     }
+
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": f"redis://127.0.0.1:6379/1",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            },
+        }
+    }
+
 elif DEVELOPMENT_MODE is False:
     CHANNEL_LAYERS = {
         # Since the project is dockerized, we can use the redis container as the backend, service name is redis
@@ -176,3 +189,22 @@ elif DEVELOPMENT_MODE is False:
             },
         }
     }
+
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": f"{os.getenv('REDIS_URL', 'redis://redis:6379')}/1",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            },
+        }
+    }
+
+
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379')
+CELERY_RESULT_BACKEND = os.getenv(
+    'CELERY_RESULT_BACKEND', 'redis://localhost:6379')
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
