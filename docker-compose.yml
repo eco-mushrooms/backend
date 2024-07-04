@@ -1,20 +1,12 @@
 version: '3.9'
 
 services:
-  db:
-    image: postgres:16.0
-    container_name: db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    env_file:
-      - ./.env.db
-
-  web:
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: web
-    command: daphne core.asgi:application --port 8000 --bind 0.0.0.0 -v 3
+    entrypoint: [ "./entrypoint.sh" ]
     expose:
       - 8000
     volumes:
@@ -36,15 +28,38 @@ services:
     ports:
       - "1337:80"
     depends_on:
-      - web
+      - backend
+
+  db:
+    image: postgres:16.0
+    container_name: db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env.db
 
   redis:
-    build: redis
+    image: redis:alpine
     container_name: redis_server
     expose:
       - 6379
 
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile # I think we should create a separate Dockerfile for celery
+    container_name: celery
+    entrypoint: [ "./worker-entrypoint.sh" ]
+    volumes:
+      - celery_volume:/home/app/web/celeryfiles
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+      - redis
+
 volumes:
-  postgres_data:
   static_volume:
   media_volume:
+  postgres_data:
+  celery_volume:

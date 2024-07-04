@@ -75,7 +75,8 @@ RUN chown -R app:app $APP_HOME
 USER app
 
 # Run the entrypoint
-ENTRYPOINT [ "/home/app/web/entrypoint.sh" ]
+# I'll run it in the docker-compose file from now on
+# ENTRYPOINT [ "/home/app/web/entrypoint.sh" ]
 
 
 
