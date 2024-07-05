@@ -15,7 +15,7 @@ if env_file.exists():
     dotenv.load_dotenv(env_file)
 
 
-DEVELOPMENT_MODE = os.getenv('DEVELOPMENT_MODE', 'True') == 'True'
+DEVELOPMENT_MODE = os.getenv('DEVELOPMENT_MODE', 'False') == 'True'
 
 SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 
@@ -158,6 +158,7 @@ REST_FRAMEWORK = {
     ],
 }
 
+print(f'Development mode: {DEVELOPMENT_MODE}')
 # Channels
 if DEVELOPMENT_MODE:
     CHANNEL_LAYERS = {

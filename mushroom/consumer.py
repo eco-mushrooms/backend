@@ -2,8 +2,6 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 import json
 
-from mushroom.models import Microcontroller
-
 
 class MushroomConsumer(AsyncWebsocketConsumer):
 
@@ -77,6 +75,7 @@ class MushroomConsumer(AsyncWebsocketConsumer):
 
     @sync_to_async
     def get_microcontroller(self, name):
+        from mushroom.models import Microcontroller
         try:
             return Microcontroller.objects.get(name=name)
         except Microcontroller.DoesNotExist:

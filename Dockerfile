@@ -68,6 +68,9 @@ RUN chmod +x $APP_HOME/entrypoint.sh
 # Copy project
 COPY . $APP_HOME
 
+# Set django settings module
+ENV DJANGO_SETTINGS_MODULE=core.settings
+
 # Chawn all the files to the app user
 RUN chown -R app:app $APP_HOME
 
