@@ -1,0 +1,23 @@
+FROM python:3.11.4-slim-bullseye AS BASE
+
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
+
+WORKDIR /home/app/web
+
+COPY ./requirements.txt ./
+
+
+
+RUN apt-get update &&   apt-get install -y curl inetutils-ping
+
+RUN pip install -r requirements.txt  
+
+# COPY . .
+
+
+# RUN python manage.py makemigrations && python  manage.py migrate
+
+# CMD python manage.py runserver
+
+EXPOSE 8000

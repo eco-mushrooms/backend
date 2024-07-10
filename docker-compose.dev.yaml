@@ -1,0 +1,107 @@
+services:
+  backend-dev:
+    build:
+      # context: .
+      dockerfile: Dockerfile.dev
+    container_name: backend-dev
+    # entrypoint: [ "./entrypoint.dev.sh" ]
+    command: /home/app/web/entrypoint.dev.sh
+    ports:
+      - 5001:8000
+    volumes:
+      # - ./data/static_volume:/home/app/web/staticfiles
+      # - ./data/media_volume:/home/app/web/mediafiles
+      - .:/home/app/web
+
+    environment:
+      - REDIS_URL=${REDIS_URL_DEV}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL_DEV}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND_DEV}
+      - DATABASE_USER=${DATABASE_USER_DEV}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD_DEV}
+      - DATABASE_HOST=${DATABASE_HOST_DEV}
+      - DEBUG=${DEBUG_DEV}
+    # healthcheck:
+    #   test:
+    #     [
+    #       "CMD",
+    #       "curl",
+    #       "-f",
+    #       "http://localhost:8000/health-check"
+    #     ]
+    #   interval: 30s
+    #   timeout: 30s
+    #   retries: 5
+    #   start_period: 30s
+    depends_on:
+      db-dev:
+        condition: service_healthy
+        restart: true
+
+  # nginx-dev:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.dev.nginx
+  #   container_name: nginx-dev
+  #   volumes:
+  #     - .:/home/app/web
+  #   ports:
+  #     - "1337:80"
+  #   depends_on:
+  #     - backend-dev
+
+  db-dev:
+    image: postgres:16.0
+    container_name: db-dev
+    volumes:
+      - ./data/postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_ROOT_PASSWORD=root
+      - POSTGRES_USER=gitonga
+      - POSTGRES_PASSWORD=gitongah
+      - POSTGRES_DB=mushrooms
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-U", "gitonga" ]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+  redis-dev:
+    image: redis:alpine
+    container_name: redis-dev
+    expose:
+      - 6379
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+  celery-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev # I think we should create a separate Dockerfile for celery
+    container_name: celery-dev
+    entrypoint: [ "./worker-entrypoint.sh" ]
+    volumes:
+      - ./data/celery_volume:/home/app/web/celeryfiles
+      - .:/home/app/web
+    environment:
+      - REDIS_URL=${REDIS_URL_DEV}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL_DEV}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND_DEV}
+
+    depends_on:
+      db-dev:
+        condition: service_healthy
+        restart: true
+      redis-dev:
+        condition: service_healthy
+        restart: true
+        # volumes:
+        #   static_volume:
+        #   media_volume:
+        #   postgres_data:
+        #   celery_volume:
