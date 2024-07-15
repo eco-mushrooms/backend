@@ -20,7 +20,7 @@ DEVELOPMENT_MODE = os.getenv('DEVELOPMENT_MODE', 'False') == 'True'
 
 SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = True  # os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.getenv(
     'ALLOWED_HOSTS', '127.0.0.1,3885-102-215-33-94.ngrok-free.app').split(',')
@@ -91,14 +91,14 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:8000',
     'http://localhost:3000',
     'http://localhost:1337',
-    'https://3885-102-215-33-94.ngrok-free.app'
+    'https://5f62-41-204-187-5.ngrok-free.app'
     # 'http://nginx:1337',
 ]
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://localhost:3000',
     'http://localhost:1337',
-    'https://3885-102-215-33-94.ngrok-free.app'
+    'https://5f62-41-204-187-5.ngrok-free.app'
 ]
 
 

@@ -1,9 +1,6 @@
-version: '3.9'
-
 services:
   backend:
     build:
-      context: .
       dockerfile: Dockerfile
     container_name: backend
     entrypoint: [ "./entrypoint.sh" ]
@@ -12,8 +9,14 @@ services:
     volumes:
       - static_volume:/home/app/web/staticfiles
       - media_volume:/home/app/web/mediafiles
-    env_file:
-      - ./.env.prod
+    environment:
+      - REDIS_URL=${REDIS_URL_PROD}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL_PROD}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND_PROD}
+      - DATABASE_USER=${DATABASE_USER_PROD}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD_PROD}
+      - DATABASE_HOST=${DATABASE_HOST_PROD}
+      - DEBUG=${DEBUG_PROD}
     depends_on:
       - db
     healthcheck:
@@ -31,12 +34,12 @@ services:
 
   nginx:
     build:
-      context: .
       dockerfile: Dockerfile.nginx
     container_name: nginx
     volumes:
       - static_volume:/home/app/web/staticfiles
       - media_volume:/home/app/web/mediafiles
+      - .:/home/app/web
     ports:
       - "1337:80"
     depends_on:
@@ -47,15 +50,18 @@ services:
     container_name: db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    env_file:
-      - ./.env.db
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 1m30s
       timeout: 30s
       retries: 5
       start_period: 30s
 
+    environment:
+      - POSTGRES_ROOT_PASSWORD=${POSTGRES_ROOT_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
   redis:
     image: redis:alpine
     container_name: redis
@@ -70,14 +76,16 @@ services:
 
   celery:
     build:
-      context: .
       dockerfile: Dockerfile # I think we should create a separate Dockerfile for celery
     container_name: celery
     entrypoint: [ "./worker-entrypoint.sh" ]
     volumes:
       - celery_volume:/home/app/web/celeryfiles
-    env_file:
-      - ./.env.prod
+      - .:/home/app/web
+    environment:
+      - REDIS_URL=${REDIS_URL_PROD}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL_PROD}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND_PROD}
     depends_on:
       - db
       - redis

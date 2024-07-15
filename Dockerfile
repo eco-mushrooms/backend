@@ -3,7 +3,7 @@
 ###########
 
 # Set the base image for build stage
-FROM python:3.12-slim as builder
+FROM python:3.11-slim-bullseye as builder
 
 # Set the working directory
 WORKDIR /usr/src/app
@@ -33,7 +33,7 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requir
 #########
 
 # Set the base image for final stage
-FROM python:3.12-slim
+FROM python:3.11-slim-bullseye
 
 # Create a directory for the app user
 RUN mkdir -p /home/app
@@ -51,7 +51,7 @@ WORKDIR $APP_HOME
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq5 \
+    libpq5 curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies by copying the wheels from the builder stage

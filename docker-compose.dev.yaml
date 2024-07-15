@@ -9,8 +9,6 @@ services:
     ports:
       - 5001:8000
     volumes:
-      # - ./data/static_volume:/home/app/web/staticfiles
-      # - ./data/media_volume:/home/app/web/mediafiles
       - .:/home/app/web
 
     environment:
@@ -21,34 +19,11 @@ services:
       - DATABASE_PASSWORD=${DATABASE_PASSWORD_DEV}
       - DATABASE_HOST=${DATABASE_HOST_DEV}
       - DEBUG=${DEBUG_DEV}
-    # healthcheck:
-    #   test:
-    #     [
-    #       "CMD",
-    #       "curl",
-    #       "-f",
-    #       "http://localhost:8000/health-check"
-    #     ]
-    #   interval: 30s
-    #   timeout: 30s
-    #   retries: 5
-    #   start_period: 30s
+
     depends_on:
       db-dev:
         condition: service_healthy
         restart: true
-
-  # nginx-dev:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.dev.nginx
-  #   container_name: nginx-dev
-  #   volumes:
-  #     - .:/home/app/web
-  #   ports:
-  #     - "1337:80"
-  #   depends_on:
-  #     - backend-dev
 
   db-dev:
     image: postgres:16.0
