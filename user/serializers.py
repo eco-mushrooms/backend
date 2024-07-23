@@ -1,8 +1,12 @@
+import jwt
 from typing import Any, Dict
+from django.conf import settings
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from .utils import generate_access_token, generate_refresh_token
 from rest_framework.exceptions import ValidationError, AuthenticationFailed
+
+from core.authenticate import JWTAuthentication
 
 
 User = get_user_model()
@@ -75,10 +79,17 @@ class UserLoginSerializer(serializers.ModelSerializer):
 
 
 class UserRefreshSerializer(serializers.Serializer):
-    refresh = serializers.Charfield()
+    refresh = serializers.CharField()
+    access = serializers.CharField(read_only=True)
 
     def validate(self, attrs: Dict[str, Any]) -> Dict[Any, Any]:
         refresh = attrs.get('refresh')
 
         if refresh is None:
             raise ValidationError('Refresh token is required')
+
+        user = JWTAuthentication.authenticate_credentials(refresh)[0]
+
+        data = {
+            'access': generate_access_token(user)
+        }

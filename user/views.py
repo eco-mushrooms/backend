@@ -10,7 +10,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework import status
 from django.contrib.auth import get_user_model
 
-from .serializers import UserCreateSerializer, UserListSerializer, UserLoginSerializer
+from .serializers import UserCreateSerializer, UserListSerializer, UserLoginSerializer, UserRefreshSerializer
 
 
 class CreateUserView(CreateAPIView):
@@ -39,9 +39,10 @@ class UserLoginView(APIView):
         }, status=status.HTTP_200_OK)
 
 
-class UserRefreshView(APIView):
+class UserRefreshView(CreateAPIView):
     permission_classes = [AllowAny]
+    serializer_class = UserRefreshSerializer
 
-    def post(self, request):
 
-        pass
+class GoogleSignInView(APIView):
+    pass
