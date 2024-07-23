@@ -12,6 +12,7 @@ services:
       - .:/home/app/web
 
     environment:
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
       - REDIS_URL=${REDIS_URL_DEV}
       - CELERY_BROKER_URL=${CELERY_BROKER_URL_DEV}
       - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND_DEV}
@@ -19,6 +20,8 @@ services:
       - DATABASE_PASSWORD=${DATABASE_PASSWORD_DEV}
       - DATABASE_HOST=${DATABASE_HOST_DEV}
       - DEBUG=${DEBUG_DEV}
+      - SECRET_KEY=${SECRET_KEY}
+      - DEVELOPMENT_MODE=${DEVELOPMENT_MODE_DEV}
 
     depends_on:
       db-dev:
@@ -36,11 +39,18 @@ services:
       - POSTGRES_PASSWORD=gitongah
       - POSTGRES_DB=mushrooms
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready", "-U", "gitonga" ]
+      test: [ "CMD-SHELL", "pg_isready" ]
       interval: 30s
       timeout: 30s
       retries: 5
       start_period: 30s
+
+  adminer-dev:
+    container_name: adminer-dev
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
 
   redis-dev:
     image: redis:alpine
@@ -64,9 +74,16 @@ services:
       - ./data/celery_volume:/home/app/web/celeryfiles
       - .:/home/app/web
     environment:
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
       - REDIS_URL=${REDIS_URL_DEV}
       - CELERY_BROKER_URL=${CELERY_BROKER_URL_DEV}
       - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND_DEV}
+      - DATABASE_USER=${DATABASE_USER_DEV}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD_DEV}
+      - DATABASE_HOST=${DATABASE_HOST_DEV}
+      - DEBUG=${DEBUG_DEV}
+      - SECRET_KEY=${SECRET_KEY}
+      - DEVELOPMENT_MODE=${DEVELOPMENT_MODE_DEV}
 
     depends_on:
       db-dev:
@@ -75,8 +92,3 @@ services:
       redis-dev:
         condition: service_healthy
         restart: true
-        # volumes:
-        #   static_volume:
-        #   media_volume:
-        #   postgres_data:
-        #   celery_volume:

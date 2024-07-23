@@ -9,11 +9,7 @@ import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# env_file = BASE_DIR / '.env'
-
-# if env_file.exists():
-#     dotenv.load_dotenv()
-dotenv.load_dotenv()
+env_file = BASE_DIR / '.env.dev'
 
 
 DEVELOPMENT_MODE = os.getenv('DEVELOPMENT_MODE', 'False') == 'True'
@@ -90,16 +86,15 @@ ASGI_APPLICATION = 'core.asgi.application'
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8000',
-    'http://localhost:3000',
     'http://localhost:1337',
-    'https://42f4-41-204-187-5.ngrok-free.app'
-    # 'http://nginx:1337',
+    'https://42f4-41-204-187-5.ngrok-free.app',
+    'http://localhost:5173',
 ]
 CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',
     'http://localhost:8000',
-    'http://localhost:3000',
     'http://localhost:1337',
-    'https://42f4-41-204-187-5.ngrok-free.app'
+    'https://42f4-41-204-187-5.ngrok-free.app',
 ]
 
 
@@ -112,7 +107,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DATABASE_ENGINE'),
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('DATABASE_NAME'),
         'USER': os.getenv('DATABASE_USER'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
