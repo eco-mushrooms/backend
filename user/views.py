@@ -44,5 +44,17 @@ class UserRefreshView(CreateAPIView):
     serializer_class = UserRefreshSerializer
 
 
+class PasswordResetView(APIView):
+    pass
+
+
+class PasswordResetConfirmView(APIView):
+    pass
+
+
+class FacebookSignInView(APIView):
+    pass
+
+
 class GoogleSignInView(APIView):
     pass
