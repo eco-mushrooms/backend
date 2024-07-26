@@ -20,7 +20,7 @@ class RoomAdmin(admin.ModelAdmin):
 
 @admin.register(Farm)
 class FarmAdmin(admin.ModelAdmin):
-    list_display = ('name', 'location', 'rooms')
+    list_display = ('name', 'location')
     list_filter = ('location',)
     search_fields = ('name', 'location')
     ordering = ('name',)

@@ -1,10 +1,13 @@
 from django.db import models
 from microcontroller.models import Microcontroller
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class Location(models.Model):
-    latitude = models.DecimalField(max_digits=20, decimal_places=15)
-    longitude = models.DecimalField(max_digits=20, decimal_places=15)
+    latitude = models.DecimalField(max_digits=13, decimal_places=9)
+    longitude = models.DecimalField(max_digits=13, decimal_places=9)
 
     def __str__(self):
         return f'Lat: {self.latitude}\nLong: {self.longitude}'
@@ -16,16 +19,16 @@ class Room(models.Model):
     microcontroller = models.ForeignKey(
         Microcontroller, related_name='microcontroller', on_delete=models.SET_NULL, null=True)
     no_of_bags = models.IntegerField()
+    farm = models.ForeignKey('Farm', on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return f'{self.name} - {self.mushroom_variety}'
+        return f'Farm: {self.farm}\nRoom: {self.name}\nMushroom Variety: {self.mushroom_variety}\nMicrocontroller: {self.microcontroller}\nNo of Bags: {self.no_of_bags}'
 
 
 class Farm(models.Model):
     name = models.CharField(max_length=100, unique=True)
     location = models.ForeignKey(
         Location, on_delete=models.SET_NULL, null=True)
-    rooms = models.ForeignKey(Room, on_delete=models.SET_NULL, null=True)
 
     def __str__(self) -> str:
         return f'{self.name} at\n{self.location}'

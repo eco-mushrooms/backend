@@ -33,7 +33,8 @@ class UserManager(BaseUserManager):
 class CustomUser(AbstractUser):
     ROLES = (
         ('admin', 'Admin'),
-        ('regular', 'Regular')
+        ('owner', 'Owner'),
+        ('employee', 'Employee')
     )
 
     email = models.EmailField(unique=True)
@@ -48,3 +49,11 @@ class CustomUser(AbstractUser):
 
     def __str__(self) -> str:
         return self.email
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    farm = models.ForeignKey('farm.Farm', on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return f'{self.user.email} at {self.farm.name} as {self.user.role}'
