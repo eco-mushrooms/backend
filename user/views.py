@@ -3,7 +3,7 @@
 ########################
 
 from rest_framework.generics import CreateAPIView, ListAPIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.exceptions import NotFound
@@ -19,7 +19,7 @@ class CreateUserView(CreateAPIView):
 
 
 class UserListView(ListAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
     serializer_class = UserListSerializer
     queryset = get_user_model().objects.all()
 

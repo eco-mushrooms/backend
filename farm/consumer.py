@@ -35,13 +35,8 @@ class MushroomConsumer(AsyncWebsocketConsumer):
         _type = text_data['type']
 
         if _type == 'monitor':
-            microcontroller_name = text_data['microcontroller_name']
+            room = text_data['room']
             sensor_data: dict = text_data['sensor_data']
-            microcontroller = await self.get_microcontroller(microcontroller_name)
-
-            if microcontroller is None:
-                await self.error_message(f'Microcontroller with name {microcontroller_name} does not exist')
-                return
 
             # TODO: Save sensor data to the database (I advice we dedicate a background task to do this i.e using
             #   celery)
@@ -50,7 +45,7 @@ class MushroomConsumer(AsyncWebsocketConsumer):
                 self.room_group_name,
                 {
                     'type': 'monitor',
-                    'microcontroller_name': microcontroller_name,
+                    'room': room,
                     'message': message,
                     'sensor_data': sensor_data
                 }
@@ -72,11 +67,3 @@ class MushroomConsumer(AsyncWebsocketConsumer):
 
     async def error_message(self, error_message: str):
         await self.send(text_data=json.dumps({'error': error_message}))
-
-    @sync_to_async
-    def get_microcontroller(self, name):
-        from mushroom.models import Microcontroller
-        try:
-            return Microcontroller.objects.get(name=name)
-        except Microcontroller.DoesNotExist:
-            return None

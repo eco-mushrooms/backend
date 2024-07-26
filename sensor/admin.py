@@ -1,16 +1,16 @@
 from django.contrib import admin
 from .models import (
-    TemperatureHumiditySensor,
-    SoilMoistureSensor,
     CO2Sensor,
-    LightSensor
+    SensorData,
+    LightSensor,
+    SoilMoistureSensor,
+    TemperatureHumiditySensor,
 )
 
 
 @admin.register(TemperatureHumiditySensor)
 class TemperatureHumiditySensorAdmin(admin.ModelAdmin):
-    list_display = ('sensor_type', 'temperature',
-                    'humidity', 'location', 'last_updated')
+    list_display = ('sensor_type', 'location', 'last_updated')
     list_filter = ('location',)
     search_fields = ('location',)
     ordering = ('-last_updated',)
@@ -18,8 +18,7 @@ class TemperatureHumiditySensorAdmin(admin.ModelAdmin):
 
 @admin.register(SoilMoistureSensor)
 class SoilMoistureSensorAdmin(admin.ModelAdmin):
-    list_display = ('sensor_type', 'moisture_level',
-                    'location', 'last_updated')
+    list_display = ('sensor_type', 'location', 'last_updated')
     list_filter = ('location',)
     search_fields = ('location', )
     ordering = ('-last_updated',)
@@ -27,7 +26,7 @@ class SoilMoistureSensorAdmin(admin.ModelAdmin):
 
 @admin.register(CO2Sensor)
 class CO2SensorAdmin(admin.ModelAdmin):
-    list_display = ('sensor_type', 'co2_level', 'location', 'last_updated')
+    list_display = ('sensor_type', 'location', 'last_updated')
     list_filter = ('location',)
     search_fields = ('location',)
     ordering = ('-last_updated',)
@@ -35,7 +34,15 @@ class CO2SensorAdmin(admin.ModelAdmin):
 
 @admin.register(LightSensor)
 class LightSensorAdmin(admin.ModelAdmin):
-    list_display = ('sensor_type', 'light_level', 'location', 'last_updated')
+    list_display = ('sensor_type', 'location', 'last_updated')
     list_filter = ('location',)
     search_fields = ('location',)
     ordering = ('-last_updated',)
+
+
+@admin.register(SensorData)
+class SensorDataAdmin(admin.ModelAdmin):
+    list_display = ('sensor_type', 'timestamp', 'value')
+    list_filter = ('sensor_type', 'timestamp')
+    search_fields = ('sensor_type', 'timestamp')
+    ordering = ('-timestamp',)

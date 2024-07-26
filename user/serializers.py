@@ -25,13 +25,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
         user = User.objects.create_user(**validated_data, role=role)
 
-        if role == 'regular':
-            user.is_staff = True
-            user.save()
-
         if role == 'admin':
             user.is_staff = True
-            user.is_superuser = True
             user.save()
 
         return user

@@ -38,15 +38,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Local apps
+    'farm',
     'user',
-    'mushroom',
     'sensor',
+    'microcontroller',
 
 
     # Third party apps
+    'corsheaders',
     'rest_framework',
     'django_celery_results',
-    'corsheaders',
 
 ]
 

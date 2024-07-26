@@ -2,7 +2,7 @@ import os
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
-import mushroom.routing  # Import routing, not urls, to avoid early model import
+import farm.routing  # Import routing, not urls, to avoid early model import
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 
@@ -12,7 +12,7 @@ application = ProtocolTypeRouter({
     "http": django_asgi_app,
     "websocket": AuthMiddlewareStack(
         URLRouter(
-            mushroom.routing.websocket_urlpatterns
+            farm.routing.websocket_urlpatterns
         )
     ),
 })
