@@ -61,7 +61,7 @@ RUN pip install --upgrade pip
 RUN pip install --no-cache /wheels/*
 
 # Copy entrypoint
-COPY ./entrypoint.sh .
+COPY ./docker-entrypoint.sh .
 RUN sed -i 's/\r$//g' $APP_HOME/entrypoint.sh
 RUN chmod +x $APP_HOME/entrypoint.sh
 
