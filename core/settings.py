@@ -85,26 +85,15 @@ ASGI_APPLICATION = 'core.asgi.application'
 
 # Cors
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8000',
-    'http://localhost:1337',
-    'https://42f4-41-204-187-5.ngrok-free.app',
-    'http://localhost:5173',
-]
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:5173',
-    'http://localhost:8000',
-    'http://localhost:1337',
-    'https://42f4-41-204-187-5.ngrok-free.app',
-]
+CORS_ALLOWED_ORIGINS = os.getenv(
+    'CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://localhost:8000').split(',')
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    'CSRF_TRUSTED_ORIGINS', 'http://localhost:5173,http://localhost:8000').split(',')
 
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-# print(
-#     f"DATABASE_ENGINE: {os.getenv('DATABASE_ENGINE')}"
-# )
+############
+# Database #
+############
 
 if DEVELOPMENT_MODE:
     DATABASES = {
@@ -156,20 +145,25 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
+#########################################
+# Static files (CSS, JavaScript, Images)#
+#########################################
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static',]
 
-# Media files (Images, Videos, etc)
+####################################
+# Media files (Images, Videos, etc)#
+####################################
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'mediafiles'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Rest Framework
+#################
+# Rest Framework#
+#################
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
@@ -179,7 +173,9 @@ REST_FRAMEWORK = {
     ],
 }
 
-# Channels
+######################
+# Channels and Cache #
+######################
 if DEVELOPMENT_MODE:
     CHANNEL_LAYERS = {
         "default": {
