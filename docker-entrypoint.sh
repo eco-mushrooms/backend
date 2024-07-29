@@ -1,5 +1,16 @@
 #!/bin/sh
 
+if [ "$DATABASE" = "postgres" ]
+then
+    echo "Waiting for postgres..."
+
+    while ! nc -z $SQL_HOST $SQL_PORT; do
+      sleep 0.1
+    done
+
+    echo "PostgreSQL started"
+fi
+
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 echo "Collect static files done"
@@ -13,6 +24,7 @@ python manage.py migrate
 echo "Apply database migrations done"
 
 echo "Starting server..."
-python manage.py runserver 0.0.0.0:8000
+service start nginx
+daphne core.asgi:application --port 8001 --bind 0.0.0.0 -v 3
 
 exec "$@"
