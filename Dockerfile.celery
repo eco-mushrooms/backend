@@ -22,4 +22,4 @@ RUN ls -la
 
 
 CMD ["/app/worker-entrypoint.sh"]
-EXPOSE 80
+EXPOSE 1337
