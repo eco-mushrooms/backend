@@ -1,97 +1,26 @@
-###########
-# Builder #
-###########
+FROM ubuntu:22.04
 
-# Set the base image for build stage
-FROM python:3.11-slim-bullseye as builder
+# Install necessary packages
+RUN apt-get update && apt-get install -y python3 python3-pip nginx
+RUN apt-get update && apt-get install -y python3  python3-pip 
+# Set the working directory in the container
+WORKDIR /app
 
-# Set the working directory
-WORKDIR /usr/src/app
+# Copy the Django application code to the container
+COPY . .
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# convert all shell script to executable
+RUN chmod +x *.sh
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    python3-dev \
-    musl-dev \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Build wheel packages
+RUN pip install -r requirements.txt
+# Copy the Nginx configuration file
+COPY nginx.conf /etc/nginx/sites-available/default
 
-# Install pip
-RUN pip install --upgrade pip
+# Lets list the files
+RUN ls -la
 
-# Install dependencies 
-# First copy only the requirements file to leverage Docker cache
-COPY ./requirements.txt .
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
+RUN service nginx start
 
-#########
-# Final #
-#########
-
-# Set the base image for final stage
-FROM python:3.11-slim-bullseye
-
-# Create a directory for the app user
-RUN mkdir -p /home/app
-
-# Create the app user
-RUN addgroup --system app && adduser --system --group app
-
-# Create the appropriate directories
-ENV HOME=/home/app
-ENV APP_HOME=/home/app/web
-RUN mkdir $APP_HOME
-
-# Set environment variables
-WORKDIR $APP_HOME
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq5 curl nginx \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install dependencies by copying the wheels from the builder stage
-COPY --from=builder /usr/src/app/wheels /wheels
-COPY --from=builder /usr/src/app/requirements.txt .
-RUN pip install --upgrade pip
-RUN pip install --no-cache /wheels/*
-
-# Copy entrypoint
-COPY ./docker-entrypoint.sh .
-RUN sed -i 's/\r$//g' $APP_HOME/docker-entrypoint.sh
-RUN chmod +x $APP_HOME/docker-entrypoint.sh
-
-# Copy project
-COPY . $APP_HOME
-
-
-# Nginx setup
-COPY  ./nginx.conf /etc/nginx/sites-enabled/default
-
-
-
-# Set django settings module
-ENV DJANGO_SETTINGS_MODULE=core.settings
-
-# Chawn all the files to the app user
-RUN chown -R app:app $APP_HOME
-
-# Change to the app user
-USER app
-
+CMD ["/app/docker-entrypoint.sh"]
 EXPOSE 80
-
-# Run the entrypoint
-# I'll run it in the docker-compose file from now on
-ENTRYPOINT [ "/home/app/web/docker-entrypoint.sh" ]
-
-
-
-
-
-
-

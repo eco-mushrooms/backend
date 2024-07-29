@@ -12,19 +12,36 @@ then
 fi
 
 echo "Collecting static files..."
-python manage.py collectstatic --noinput
+python3 manage.py collectstatic --noinput
 echo "Collect static files done"
 
+# Check availability of static files
+if [ ! -d "/app/staticfiles" ]; then
+    echo "Static files not found"
+    exit 1
+fi
+
 echo "Make migrations..."
-python manage.py makemigrations
+python3 manage.py makemigrations
 echo "Make migrations done"
 
 echo "Apply database migrations..."
-python manage.py migrate
+python3 manage.py migrate
 echo "Apply database migrations done"
 
+# Start the server using Daphne for ASGI
 echo "Starting server..."
-service start nginx
+
+# Check if nginx service is running
+if pgrep nginx > /dev/null
+then
+    echo "Nginx is running"
+else
+    echo "Nginx is not running, starting nginx..."
+    service nginx start
+fi
+
 daphne core.asgi:application --port 8001 --bind 0.0.0.0 -v 3
 
+# Execute any additional commands passed to the script
 exec "$@"
