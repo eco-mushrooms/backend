@@ -14,12 +14,7 @@ RUN chmod +x *.sh
 
 # Build wheel packages
 RUN pip install -r requirements.txt
-# Copy the Nginx configuration file
-COPY nginx.conf /etc/nginx/sites-available/default
 
-# Lets list the files
-RUN ls -la
-
+EXPOSE 1337
 
 CMD ["/app/worker-entrypoint.sh"]
-EXPOSE 1337
