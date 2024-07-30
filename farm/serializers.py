@@ -1,6 +1,9 @@
+import logging
 from rest_framework import serializers
-from sensor.models import SensorData, TemperatureHumiditySensor, SoilMoistureSensor, CO2Sensor, LightSensor
 from farm.models import Room, Farm, Location
+from sensor.models import SensorData, TemperatureHumiditySensor, SoilMoistureSensor, CO2Sensor, LightSensor
+
+logger = logging.getLogger('farm.serializers')
 
 
 class SensorDataSerializer(serializers.ModelSerializer):
@@ -33,6 +36,12 @@ class LightSensorSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Location
+        fields = '__all__'
+
+
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
@@ -43,3 +52,19 @@ class FarmSerializer(serializers.ModelSerializer):
     class Meta:
         model = Farm
         fields = '__all__'
+
+    # def validate(self, attrs):
+    #     location_data = attrs.pop('location')
+
+    #     if location is None:
+    #         raise serializers.ValidationError("Location is required")
+
+    #     location = Location.objects.create(**location_data)
+
+    #     logger.debug(f'Location created: {location}')
+
+    #     attrs['location'] = location.pk
+
+    #     logger.debug(f'Farm attrs: {attrs}')
+
+    #     return attrs

@@ -1,16 +1,14 @@
 services:
   backend-dev:
     build:
-      # context: .
+      context: .
       dockerfile: Dockerfile.dev
     container_name: backend-dev
-    # entrypoint: [ "./entrypoint.dev.sh" ]
-    command: /home/app/web/entrypoint.dev.sh
-    ports:
-      - 5001:8000
+    entrypoint: [ "/app/entrypoint.dev.sh" ]
     volumes:
-      - .:/home/app/web
-
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles
     environment:
       - ALLOWED_HOSTS=${ALLOWED_HOSTS}
       - REDIS_URL=${REDIS_URL_DEV}
@@ -22,28 +20,21 @@ services:
       - DEBUG=${DEBUG_DEV}
       - SECRET_KEY=${SECRET_KEY}
       - DEVELOPMENT_MODE=${DEVELOPMENT_MODE_DEV}
-
     depends_on:
-      db-dev:
-        condition: service_healthy
-        restart: true
+      - db-dev
+      - redis-dev
+    ports:
+      - "8000:8000"
 
   db-dev:
     image: postgres:16.0
     container_name: db-dev
     volumes:
-      - ./data/postgres_data:/var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_ROOT_PASSWORD=root
-      - POSTGRES_USER=gitonga
-      - POSTGRES_PASSWORD=gitongah
-      - POSTGRES_DB=mushrooms
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready" ]
-      interval: 30s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
+      - POSTGRES_USER=${DATABASE_USER_DEV}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD_DEV}
+      - POSTGRES_DB=${DATABASE_NAME_DEV}
 
   adminer-dev:
     container_name: adminer-dev
@@ -67,28 +58,20 @@ services:
   celery-dev:
     build:
       context: .
-      dockerfile: Dockerfile.dev # I think we should create a separate Dockerfile for celery
+      dockerfile: Dockerfile.dev
     container_name: celery-dev
     entrypoint: [ "./worker-entrypoint.sh" ]
     volumes:
-      - ./data/celery_volume:/home/app/web/celeryfiles
-      - .:/home/app/web
+      - .:/app
     environment:
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
       - REDIS_URL=${REDIS_URL_DEV}
       - CELERY_BROKER_URL=${CELERY_BROKER_URL_DEV}
       - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND_DEV}
-      - DATABASE_USER=${DATABASE_USER_DEV}
-      - DATABASE_PASSWORD=${DATABASE_PASSWORD_DEV}
-      - DATABASE_HOST=${DATABASE_HOST_DEV}
-      - DEBUG=${DEBUG_DEV}
-      - SECRET_KEY=${SECRET_KEY}
-      - DEVELOPMENT_MODE=${DEVELOPMENT_MODE_DEV}
-
     depends_on:
-      db-dev:
-        condition: service_healthy
-        restart: true
-      redis-dev:
-        condition: service_healthy
-        restart: true
+      - db-dev
+      - redis-dev
+
+volumes:
+  static_volume:
+  media_volume:
+  postgres_data:

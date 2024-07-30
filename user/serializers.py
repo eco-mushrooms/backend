@@ -1,4 +1,5 @@
 import jwt
+import logging
 from typing import Any, Dict
 from django.conf import settings
 from rest_framework import serializers
@@ -11,6 +12,8 @@ from core.authenticate import JWTAuthentication
 
 
 User = get_user_model()
+
+logger = logging.getLogger('user.serializers')
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
