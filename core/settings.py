@@ -37,17 +37,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Third party apps
+    'drf_yasg',
+    'corsheaders',
+    'rest_framework',
+    'django_celery_results',
+
     # Local apps
     'farm',
     'user',
     'sensor',
     'microcontroller',
 
-
-    # Third party apps
-    'corsheaders',
-    'rest_framework',
-    'django_celery_results',
 
 ]
 

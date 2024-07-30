@@ -1,3 +1,5 @@
+from drf_yasg.utils import swagger_auto_schema
+
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -16,6 +18,11 @@ User = get_user_model()
 class FarmCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=FarmSerializer,
+        responses={status.HTTP_201_CREATED: FarmSerializer},
+        operation_description='Create a new farm'
+    )
     def post(self, request):
         location = Location.objects.create(**request.data.pop('location'))
         farm = request.data
