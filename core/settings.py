@@ -248,30 +248,14 @@ LOGGING = {
             'formatter': 'verbose',
         },
     },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
     'loggers': {
         'django': {
             'handlers': ['console'],
             'level': 'INFO',
-        },
-        'django.request': {
-            'handlers': ['console'],
-            'level': 'ERROR',
-        },
-        'django.db.backends': {
-            'handlers': ['console'],
-            'level': 'ERROR',
-        },
-        'daphne': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        },
-        'user': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        },
-        'farm': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        },
+            'propagate': True, },
     },
 }
