@@ -11,9 +11,8 @@ class LocationAdmin(admin.ModelAdmin):
 
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ('name', 'mushroom_variety',
-                    'microcontroller', 'no_of_bags')
-    list_filter = ('mushroom_variety', 'microcontroller')
+    list_display = ('name', 'mushroom_variety', 'no_of_bags')
+    list_filter = ('mushroom_variety', )
     search_fields = ('name', 'mushroom_variety')
     ordering = ('name',)
 

@@ -1,5 +1,4 @@
 from django.db import models
-from microcontroller.models import Microcontroller
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -16,8 +15,6 @@ class Location(models.Model):
 class Room(models.Model):
     name = models.CharField(max_length=100, unique=True)
     mushroom_variety = models.CharField(max_length=100)
-    microcontroller = models.ForeignKey(
-        Microcontroller, related_name='microcontroller', on_delete=models.SET_NULL, null=True)
     no_of_bags = models.IntegerField()
     farm = models.ForeignKey('Farm', on_delete=models.CASCADE)
 

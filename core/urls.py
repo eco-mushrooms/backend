@@ -29,7 +29,6 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/user/', include('user.urls')),
-    path('api/mushroom/', include('microcontroller.urls')),
     path('api/farm/', include('farm.urls')),
     path('health-check/', health_check),
     path('', schema_view.with_ui('swagger', cache_timeout=0),

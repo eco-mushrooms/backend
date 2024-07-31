@@ -8,36 +8,37 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('microcontroller', '0001_initial'),
-    ]
-
     operations = [
         migrations.CreateModel(
             name='Location',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('latitude', models.DecimalField(decimal_places=15, max_digits=20)),
-                ('longitude', models.DecimalField(decimal_places=15, max_digits=20)),
+                ('longitude', models.DecimalField(
+                    decimal_places=15, max_digits=20)),
             ],
         ),
         migrations.CreateModel(
             name='Room',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100, unique=True)),
                 ('mushroom_variety', models.CharField(max_length=100)),
                 ('no_of_bags', models.IntegerField()),
-                ('microcontroller', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='microcontroller', to='microcontroller.microcontroller')),
             ],
         ),
         migrations.CreateModel(
             name='Farm',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100, unique=True)),
-                ('location', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='farm.location')),
-                ('rooms', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='farm.room')),
+                ('location', models.ForeignKey(
+                    null=True, on_delete=django.db.models.deletion.SET_NULL, to='farm.location')),
+                ('rooms', models.ForeignKey(
+                    null=True, on_delete=django.db.models.deletion.SET_NULL, to='farm.room')),
             ],
         ),
     ]

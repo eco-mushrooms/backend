@@ -64,9 +64,16 @@ services:
     volumes:
       - .:/app
     environment:
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
       - REDIS_URL=${REDIS_URL_DEV}
       - CELERY_BROKER_URL=${CELERY_BROKER_URL_DEV}
       - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND_DEV}
+      - DATABASE_USER=${DATABASE_USER_DEV}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD_DEV}
+      - DATABASE_HOST=${DATABASE_HOST_DEV}
+      - DEBUG=${DEBUG_DEV}
+      - SECRET_KEY=${SECRET_KEY}
+      - DEVELOPMENT_MODE=${DEVELOPMENT_MODE_DEV}
     depends_on:
       - db-dev
       - redis-dev
