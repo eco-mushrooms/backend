@@ -253,6 +253,18 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'INFO',
         },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+        },
+        'daphne': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
         'user': {
             'handlers': ['console'],
             'level': 'DEBUG',
