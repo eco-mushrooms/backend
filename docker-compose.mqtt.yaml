@@ -1,14 +1,15 @@
 services:
   musquitto:
-    image: eclipse-mosquitto:1.6.12
-    container_name: musquitto
+    build:
+      context: ./mosquitto
+    container_name: mqtt-server
     ports:
-      - 1883:1883
+      - 1883:188
       - 9001:9001
     volumes:
-      - ./mosquitto/config:/mosquitto/config
-      - ./mosquitto/data:/mosquitto/data
-      - ./mosquitto/log:/mosquitto/log
+      - mosquittodata:/mosquitto/data
+      - mosquittodata:/mosquitto/log
+      - mosquittodata:/mosquitto/config
 
   mqtt-listener:
     build:
@@ -28,7 +29,7 @@ services:
       - MQTT_HOST=musquitto
       - MQTT_PORT=1883
     volumes:
-      - .:/app
+      - mqtt-listener:/app
     depends_on:
       - musquitto
 volumes:
