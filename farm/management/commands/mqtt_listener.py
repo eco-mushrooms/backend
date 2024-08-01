@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
-MQTT_BROKER = f"mqtt://{os.environ.get('MQTT_BROKER', 'localhost')}"
+MQTT_BROKER = os.environ.get('MQTT_BROKER', 'localhost')
 MQTT_PORT = int(os.environ.get('MQTT_PORT', 1883))
 
 
