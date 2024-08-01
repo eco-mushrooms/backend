@@ -1,0 +1,35 @@
+services:
+  musquitto:
+    image: eclipse-mosquitto:1.6.12
+    container_name: musquitto
+    ports:
+      - 1883:1883
+      - 9001:9001
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+  mqtt-listener:
+    build:
+      context: .
+      dockerfile: Dockerfile.mqtt
+    container_name: mqtt-listener
+    environment:
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+      - DATABASE_URL=${DATABASE_URL}
+      - DEBUG=False
+      - DEVELOPMENT_MODE=False
+      - DJANGO_SETTINGS_MODULE=core.settings
+      - REDIS_URL=${REDIS_URL}
+      - SECRET_KEY=${SECRET_KEY}
+      - MQTT_HOST=musquitto
+      - MQTT_PORT=1883
+    volumes:
+      - .:/app
+    depends_on:
+      - musquitto
+volumes:
+  mosquittodata:
