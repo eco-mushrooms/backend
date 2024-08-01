@@ -78,7 +78,42 @@ services:
       - db-dev
       - redis-dev
 
+  mosquitto-dev:
+    image: eclipse-mosquitto
+    container_name: mosquitto-dev
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/etc/mosquitto/config
+      - ./mosquitto/data:/etc/mosquitto/data
+      - ./mosquitto/log:/etc/mosquitto/log
+
+  mqtt_consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile.mqtt-consumer
+    container_name: mqtt_consumer
+    environment:
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - REDIS_URL=${REDIS_URL_DEV}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL_DEV}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND_DEV}
+      - DATABASE_USER=${DATABASE_USER_DEV}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD_DEV}
+      - DATABASE_HOST=${DATABASE_HOST_DEV}
+      - DEBUG=${DEBUG_DEV}
+      - SECRET_KEY=${SECRET_KEY}
+      - DEVELOPMENT_MODE=${DEVELOPMENT_MODE_DEV}
+      - MQTT_BROKER=mosquitto-dev
+    depends_on:
+      - backend-dev
+      - redis-dev
+      - mosquitto-dev
+
 volumes:
   static_volume:
   media_volume:
   postgres_data:
+
+
