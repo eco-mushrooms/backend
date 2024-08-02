@@ -12,6 +12,8 @@ COPY . .
 # convert all shell script to executable
 RUN chmod +x *.sh
 
+RUN mkdir -p /app/static
+
 # Build wheel packages
 RUN pip install -r requirements.txt
 
