@@ -63,7 +63,7 @@ class Command(BaseCommand):
             print(f"Error connecting to MQTT broker: {e}")
             time.sleep(5)  # Retry after 5 seconds
 
-    def on_connect(self, client, userdata, flags, rc):
+    def on_connect(self, client, rc):
         print(f"Connected with result code {rc}")
         client.subscribe("sensor/monitor")
         client.subscribe("actuator/monitor")
