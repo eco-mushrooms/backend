@@ -17,6 +17,8 @@ RUN pip install -r requirements.txt
 # Copy the Nginx configuration file
 COPY nginx.conf /etc/nginx/sites-available/default
 
+RUN mkdir -p /app/static
+
 # Lets list the files
 RUN ls -la
 
