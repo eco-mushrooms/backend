@@ -4,64 +4,46 @@ import time
 import paho.mqtt.client as mqtt
 from django.core.management.base import BaseCommand
 from channels.layers import get_channel_layer
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
 
 MQTT_BROKER = os.environ.get('MQTT_BROKER', 'localhost')
 MQTT_PORT = int(os.environ.get('MQTT_PORT', 1883))
-
-
-class ReloadHandler(FileSystemEventHandler):
-    def __init__(self, command):
-        self.command = command
-
-    def on_any_event(self, event):
-        if event.event_type in ('modified', 'created', 'deleted'):
-            print("Change detected. Reloading...")
-            self.command.should_reload = True
+MAX_RETRIES = 10
+RETRY_INTERVAL = 5  # seconds
 
 
 class Command(BaseCommand):
-    help = 'Starts an MQTT listener with autoreload functionality.'
+    help = 'Starts an MQTT listener.'
+
     username = os.environ.get('MQTT_USERNAME', '')
     password = os.environ.get('MQTT_PASSWORD', '')
 
     def handle(self, *args, **options):
-        self.should_reload = False
-
-        event_handler = ReloadHandler(self)
-        observer = Observer()
-        observer.schedule(event_handler, path='.', recursive=True)
-        observer.start()
-
-        try:
-            while True:
-                if self.should_reload:
-                    self.reload()
-                    self.should_reload = False
-                self.run_mqtt_listener()
-                time.sleep(1)
-        except KeyboardInterrupt:
-            observer.stop()
-        observer.join()
-
-    def reload(self):
-        print("Reloading...")
-        os.execv(sys.executable, ['python'] + sys.argv)
+        self.run_mqtt_listener()
 
     def run_mqtt_listener(self):
-        client = mqtt.Client(protocol=mqtt.MQTTv5)
-        client.on_connect = self.on_connect
-        client.on_message = self.on_message
+        failure_count = 0
 
-        try:
-            client.username_pw_set(
-                username=self.username, password=self.password)
-            client.connect(MQTT_BROKER, MQTT_PORT, 60)
-            client.loop_start()
-        except Exception as e:
-            print(f"Error connecting to MQTT broker: {e}")
-            time.sleep(5)  # Retry after 5 seconds
+        while failure_count < MAX_RETRIES:
+            client = mqtt.Client(protocol=mqtt.MQTTv5)
+            client.on_connect = self.on_connect
+            client.on_message = self.on_message
+
+            try:
+                client.username_pw_set(
+                    username=self.username, password=self.password)
+                client.connect(MQTT_BROKER, MQTT_PORT, 60)
+                client.loop_forever()
+                break  # Exit loop if connection is successful
+            except Exception as e:
+                print(f"Error connecting to MQTT broker: {e}")
+                failure_count += 1
+                if failure_count < MAX_RETRIES:
+                    print(f"Retrying in {RETRY_INTERVAL} seconds...")
+                    time.sleep(RETRY_INTERVAL)
+                else:
+                    print("Max retries reached. Exiting...")
+                    # Exit with an error code if max retries reached
+                    sys.exit(1)
 
     def on_connect(self, client, userdata, flags, reason_code, properties):
         print(f"Connected with result code {reason_code}")
