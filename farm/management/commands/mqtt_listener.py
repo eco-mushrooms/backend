@@ -1,10 +1,12 @@
 import os
 import sys
 import time
+import logging
 import paho.mqtt.client as mqtt
 from django.core.management.base import BaseCommand
 from channels.layers import get_channel_layer
 
+logger = logging.getLogger(__name__)
 MQTT_BROKER = os.environ.get('MQTT_BROKER', 'localhost')
 MQTT_PORT = int(os.environ.get('MQTT_PORT', 1883))
 MAX_RETRIES = 10
@@ -35,23 +37,25 @@ class Command(BaseCommand):
                 client.loop_forever()
                 break  # Exit loop if connection is successful
             except Exception as e:
-                print(f"Error connecting to MQTT broker: {e}")
+                logger.error(f"Error connecting to MQTT broker: {e}")
                 failure_count += 1
                 if failure_count < MAX_RETRIES:
-                    print(f"Retrying in {RETRY_INTERVAL} seconds...")
+                    logger.info(
+                        f"Retrying in {RETRY_INTERVAL} seconds ({failure_count}/{MAX_RETRIES})...")
                     time.sleep(RETRY_INTERVAL)
                 else:
-                    print("Max retries reached. Exiting...")
+                    logger.error(
+                        f"Max retries reached ({MAX_RETRIES}). Exiting....")
                     # Exit with an error code if max retries reached
                     sys.exit(1)
 
     def on_connect(self, client, userdata, flags, reason_code, properties):
-        print(f"Connected with result code {reason_code}")
+        logger.info(f"Connected to MQTT broker: {reason_code}")
         client.subscribe("sensor/monitor")
         client.subscribe("actuator/monitor")
 
     def on_message(self, client, userdata, msg):
-        print(f"{msg.topic} {msg.payload}")
+        logger.info(f"Received message: {msg.topic} {msg.payload.decode()}")
         if msg.topic == "sensor/monitor":
             channel_layer = get_channel_layer()
             channel_layer.group_send(
