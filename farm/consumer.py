@@ -51,14 +51,6 @@ class MushroomConsumer(AsyncWebsocketConsumer):
                 }
             )
 
-    async def monitor(self, event):
-        microcontroller_name = event['microcontroller_name']
-        sensor_data = event['sensor_data']
-        await self.send(text_data=json.dumps({
-            'microcontroller_name': microcontroller_name,
-            'sensor_data': sensor_data
-        }))
-
     async def new_connection(self, event):
         message = event['message']
         await self.send(text_data=json.dumps({
@@ -67,3 +59,15 @@ class MushroomConsumer(AsyncWebsocketConsumer):
 
     async def error_message(self, error_message: str):
         await self.send(text_data=json.dumps({'error': error_message}))
+
+    async def sensor_monitor(self, event):
+        message = event['message']
+        await self.send(text_data=json.dumps({
+            'message': message
+        }))
+
+    async def actuator_monitor(self, event):
+        message = event['message']
+        await self.send(text_data=json.dumps({
+            'message': message
+        }))
