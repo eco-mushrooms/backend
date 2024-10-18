@@ -1,8 +1,8 @@
 FROM ubuntu:22.04
 
 # Install necessary packages
-RUN apt-get update && apt-get install -y python3 python3-pip nginx curl
-RUN apt-get update && apt-get install -y python3  python3-pip nginx curl
+RUN apt-get update && apt-get install -y python3 python3-pip nginx curl wget
+RUN apt-get update && apt-get install -y python3  python3-pip nginx curl wget
 # Set the working directory in the container
 WORKDIR /app
 
